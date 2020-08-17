@@ -1,0 +1,22 @@
+All below with matrix 1024x1024
+
+1.
+watkow 4
+IJK Czas:  20.2580 sec
+IKJ Czas:   6.4970 sec
+JIK Czas:  17.1860 sec
+JKI Czas:  33.6200 sec
+
+2.
+liczba watkow  = 4
+IJK Czas:  26.2380 sec
+IKJ Czas:   6.8730 sec
+JIK Czas:  25.4300 sec
+JKI Czas:  45.5110 sec
+
+3.
+liczba watkow  = 4
+IJK Czas:  19.4810 sec
+IKJ Czas:   6.3190 sec
+JIK Czas:  17.2100 sec
+JKI Czas:  34.1730 sec
