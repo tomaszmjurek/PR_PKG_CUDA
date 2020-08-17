@@ -1,0 +1,10 @@
+1. Zainstaluj CUDA-Toolkit jak Walkoś nakazał
+2. Odpal projekt i Właściwości-CUDA C/C++-Additional Include Directories popraw ścieżke do CUDA Samples /common jeśli jest inna (ale zostaw to ;./) . U mnie wygląda to tak:
+
+C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.0\common\inc;./
+
+Reszte powinieneś mieć ustawień tak jak ja, najwyzej jakby nie bylo to w
+
+Device-Code Generation: compute_35,sm_35;compute_37,sm_37;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;compute_80,sm_80;
+
+Host-Preprocessor Definitions: WIN32
