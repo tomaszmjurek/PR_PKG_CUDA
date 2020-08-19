@@ -8,3 +8,5 @@ Reszte powinieneś mieć ustawień tak jak ja, najwyzej jakby nie bylo to w
 Device-Code Generation: compute_35,sm_35;compute_37,sm_37;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;compute_80,sm_80;
 
 Host-Preprocessor Definitions: WIN32
+
+3. W projekcie może być tylko jeden plik .cu, bo inaczej się wali. Dlatego nieużywane warto dać jako .cu.txt i poprostu jak chcesz coś odpalić to wklejasz kod do tego głównego matrixCPU.cu i voil'a. Uruchamianie normalnie zielona strzałeczka u góry
