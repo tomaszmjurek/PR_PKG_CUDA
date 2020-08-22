@@ -25,8 +25,8 @@
   * Piscataway, NJ: IEEE Press, 2008, pp. Art. 31:1-11.
   */
 
-//System includes
-//#define WIN32
+  //System includes
+  //#define WIN32
 
 #include <stdio.h>
 #include <assert.h>
@@ -37,7 +37,7 @@
 // Helper functions and utilities to work with CUDA
 #include <helper_functions.h>
 #include <helper_cuda.h>
-#define block_size 8
+#define block_size 32
 
 /**
  * Matrix multiplication (CUDA Kernel) on the device: C = A * B
@@ -46,65 +46,36 @@
 template <int BLOCK_SIZE> __global__ void
 matrixMulCUDA(float* C, float* A, float* B, int wA, int wB)
 {
-    // Block index
     int bx = blockIdx.x;
     int by = blockIdx.y;
-
-    // Thread index
     int tx = threadIdx.x;
     int ty = threadIdx.y;
 
-    // Index of the first sub-matrix of A processed by the block
     int aBegin = wA * BLOCK_SIZE * by;
-    // Index of the last sub-matrix of A processed by the block
     int aEnd = aBegin + wA - 1;
-    // Step size used to iterate through the sub-matrices of A
     int aStep = BLOCK_SIZE;
-    // Index of the first sub-matrix of B processed by the block
     int bBegin = BLOCK_SIZE * bx;
-    // Step size used to iterate through the sub-matrices of B
     int bStep = BLOCK_SIZE * wB;
-
-    // Csub is used to store the element of the block sub-matrix
-    // that is computed by the thread
     float Csub = 0;
 
-    // Loop over all the sub-matrices of A and B
-    // required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
         a <= aEnd;
         a += aStep, b += bStep)
     {
-        // Declaration of the shared memory array As used to
-        // store the sub-matrix of A
         __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-        // Declaration of the shared memory array Bs used to
-        // store the sub-matrix of B
         __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
-        // Load the matrices from device memory
-        // to shared memory; each thread loads
-        // one element of each matrix
         As[ty][tx] = A[a + wA * ty + tx];
         Bs[ty][tx] = B[b + wB * ty + tx];
 
-        // Synchronize to make sure the matrices are loaded
         __syncthreads();
 
-        // Multiply the two matrices together;
-        // each thread computes one element
-        // of the block sub-matrix
 #pragma unroll
         for (int k = 0; k < BLOCK_SIZE; ++k)
         {
             Csub += As[ty][k] * Bs[k][tx];
         }
-        // Synchronize to make sure that the preceding
-        // computation is done before loading two new
-        // sub-matrices of A and B in the next iteration
         __syncthreads();
     }
-    // Write the block sub-matrix to device memory;
-    // each thread writes one element
     int c = wB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     C[c + wB * ty + tx] = Csub;
 }
@@ -200,7 +171,7 @@ int matrixMultiply(int argc, char** argv, dim3& dimsA, dim3& dimsB)
     printf("Computing result using CUDA Kernel...\n");
 
     // Performs warmup operation using matrixMul CUDA kernel //TODO dodaj 8
-    if (block_size == 8) 
+    if (block_size == 8)
     {
         matrixMulCUDA<8> << < grid, threads >> > (d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
@@ -246,10 +217,10 @@ int matrixMultiply(int argc, char** argv, dim3& dimsA, dim3& dimsB)
     }
 
     // Execute the kernel
-    int nIter = 300;
+    int nIter = 200;
 
     for (int j = 0; j < nIter; j++) {//todo dodaj == 8
-        if (block_size == 8) 
+        if (block_size == 8)
         {
             matrixMulCUDA<8> << < grid, threads >> > (d_C, d_A, d_B, dimsA.x, dimsB.x);
         }
@@ -406,12 +377,8 @@ int main(int argc, char** argv)
         printf("GPU Device %d: \"%s\" with compute capability %d.%d\n\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
     }
 
-    // Use a larger block size for Fermi and above
-     //int block_size = 32;//(deviceProp.major < 2) ? 16 : 8;
-    //printf("Block size %d", block_size);
-
-    dim3 dimsA(block_size * block_size, block_size * block_size, 1);
-    dim3 dimsB(block_size * block_size, block_size * block_size, 1);
+    dim3 dimsA(1024, 1024, 1);
+    dim3 dimsB(1024, 1024, 1);
 
     // width of Matrix A
     if (checkCmdLineFlag(argc, (const char**)argv, "wA"))
